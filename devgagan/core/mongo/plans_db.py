@@ -17,8 +17,8 @@ from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from config import MONGO_DB
  
 mongo = MongoCli(MONGO_DB)
-db = mongo.premium
-db = db.premium_db
+db = mongo.srcnew
+db = db.premium
  
 async def add_premium(user_id, expire_date):
     data = await check_premium(user_id)
