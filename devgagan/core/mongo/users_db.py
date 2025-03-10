@@ -17,8 +17,8 @@ from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 
 
 mongo = MongoCli(MONGO_DB)
-db = mongo.users
-db = db.users_db
+db = mongo.srcnew
+db = db.users
 
 
 async def get_users():
