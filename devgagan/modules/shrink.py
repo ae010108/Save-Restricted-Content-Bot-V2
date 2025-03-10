@@ -27,7 +27,7 @@ from config import MONGO_DB, WEBSITE_URL, AD_API, LOG_GROUP
  
  
 tclient = AsyncIOMotorClient(MONGO_DB)
-tdb = tclient["telegram_bot"]
+tdb = tclient["srcnew"]
 token = tdb["tokens"]
  
  
@@ -73,21 +73,22 @@ async def token_handler(client, message):
     msg = await app.get_messages(chat_id, 796)
     user_id = message.chat.id
     if len(message.command) <= 1:
-        image_url = "https://i.postimg.cc/v8q8kGyz/startimg-1.jpg"
-        join_button = InlineKeyboardButton("Join Channel", url="https://t.me/team_spy_pro")
-        premium = InlineKeyboardButton("Get Premium", url="https://t.me/kingofpatal")   
+        image_url = "https://github.com/ae010108/app1/blob/main/ayw.jpg?raw=true"
+        join_button = InlineKeyboardButton("Administrator ⚡️", url="https://t.me/jonathanfrky")
+        premium = InlineKeyboardButton("Musiqa kanal 🎶", url="https://t.me/joninmusic")  # Callback for Help button
         keyboard = InlineKeyboardMarkup([
-            [join_button],   
-            [premium]    
+            [join_button,  # First button
+            premium]   # Second button
         ])
          
         await message.reply_photo(
             msg.photo.file_id,
             caption=(
-                "Hi 👋 Welcome, Wanna intro...?\n\n"
-                "✳️ I can save posts from channels or groups where forwarding is off. I can download videos/audio from YT, INSTA, ... social platforms\n"
-                "✳️ Simply send the post link of a public channel. For private channels, do /login. Send /help to know more."
-            ),
+                "Salom 👋\n"
+                "✳️ Men orqali siz uzatish cheklangan kanal/guruhlardan postlarni saqlab olishingiz mumkin. YT, INSTA, ... ijtimoiy platformalardan video/audio yuklab olishim mumkin\n"
+                "✳️ Ommaviy kanallar uchun shunchaki post linkini yuboring. Shaxsiy kanallar uchun, avval /kirish orqali botga kiring, keyin post havolasini yuboring. Yordam uchun /yordam buyrug'ini yuboring\n\n"
+                "> Diqqat ushbu botdagi barcha harakatlaringizga o'zingiz javob berasiz! Botni keyinchalik ishlatish mobaynida ushbu qoidaga rozi ekanligingizni bildirasiz! Boshlashdan avval /shartlar buyrug'ini yuborib tanishib chiqing!!!"
+                 ),
             reply_markup=keyboard
         )
         return  
